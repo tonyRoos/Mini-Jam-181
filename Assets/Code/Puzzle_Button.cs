@@ -24,13 +24,18 @@ public class Puzzle_Button : MonoBehaviour
         if(other.tag == "Player")
         {
             anim.SetBool("isPressed", true);
-            foreach(Transform t in OpensList)
-            {
-                t.localEulerAngles = new Vector3( 0, -80, 0);
+            if (OpensList != null) {
+                foreach (Transform t in OpensList)
+                {
+                    t.localEulerAngles = new Vector3(0, -80, 0);
+                }
             }
-            foreach (Transform t in ClosesList)
+            if (ClosesList != null)
             {
-                t.localEulerAngles = Vector3.zero;
+                foreach (Transform t in ClosesList)
+                {
+                    t.localEulerAngles = Vector3.zero;
+                }
             }
         }
     }
