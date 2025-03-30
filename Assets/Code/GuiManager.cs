@@ -8,7 +8,7 @@ using System.Collections;
 
 public class GuiManager : MonoBehaviour
 {
-    [SerializeField] private GameObject pauseMenuArea, playModeUiArea;
+    [SerializeField] private GameObject pauseMenuArea, playModeUiArea, deathScreen;
 
     [SerializeField] private Gradient staminaGradient;
     [SerializeField] private Image staminaBar;
@@ -24,6 +24,7 @@ public class GuiManager : MonoBehaviour
         pauseMenuArea.SetActive(false);
         playModeUiArea.SetActive(true);
         cutsceneMode.SetActive(false);
+        deathScreen.SetActive(false);
     }
 
     public void updateStaminaBar(float status)
@@ -69,6 +70,7 @@ public class GuiManager : MonoBehaviour
         if (nextScene == 0) yield break;
         
         SceneManager.LoadScene(nextScene);
+        GameManager.currentLevel = nextScene;
     }
 
     public void setPauseMenu(bool active)
@@ -80,6 +82,11 @@ public class GuiManager : MonoBehaviour
     public void setCutsceneMode(bool active)
     {
         cutsceneMode.SetActive(active);
+    }
+
+    public void setDeathScreen(bool active)
+    {
+        deathScreen.SetActive(active);
     }
 
 }

@@ -51,6 +51,7 @@ public class Player : MonoBehaviour
                 setMenu(true);
                 updateFieldOfView();
                 updateVisibility();
+                if(Input.GetKeyDown(KeyCode.F1) || transform.position.y < -4) { Die(); }
                 break;
             case GameMode.PAUSED:
                 setMenu(false);
@@ -281,5 +282,12 @@ public class Player : MonoBehaviour
                 }
             }
         }
+    }
+
+    
+    private void Die()
+    {
+        guiManager.setDeathScreen(true);
+        gameMode = GameMode.CUT_SCENE;
     }
 }

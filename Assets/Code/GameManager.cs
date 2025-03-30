@@ -1,9 +1,9 @@
 using UnityEngine;
 
-public class GameManager
+public static class GameManager
 {
-    public bool cutscenePlaying;
-
+    //public bool cutscenePlaying;
+    public static int currentLevel { get => PlayerPrefs.GetInt("currentLevel", 0); set => PlayerPrefs.SetInt("currentLevel", value); }
 
     
 }
