@@ -3,9 +3,12 @@ using UnityEngine;
 public class GetItem : MonoBehaviour
 {
     public Item item;
+    [SerializeField] Transform itemSprite;
 
     private void Update()
     {
-        transform.Rotate( 0, Time.deltaTime * 180, 0);
+        if (!itemSprite) return;
+
+        itemSprite.Rotate( 0, Time.deltaTime * 180, 0);
     }
 }

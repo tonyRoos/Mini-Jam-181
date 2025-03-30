@@ -55,6 +55,7 @@ public class Door : MonoBehaviour
         {
             doorAnim.SetTrigger("SuccedOpen");
             player.guiManager.fadeOut(nextScene);
+            player.gameMode = GameMode.CUT_SCENE;
         }
     }
 }

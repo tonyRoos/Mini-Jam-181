@@ -1,4 +1,4 @@
-Shader "Shader Graphs/Maskable"
+Shader "Custom/Maskable"
 {
     Properties
     {

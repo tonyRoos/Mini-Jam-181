@@ -1,4 +1,5 @@
 using System.Collections;
+using System.Collections.Generic;
 using UnityEngine;
 
 public enum GameMode
@@ -41,13 +42,15 @@ public class Player : MonoBehaviour
 
     private void Update()
     {
-        switch(gameMode)
+        switch (gameMode)
         {
             case GameMode.MAIN:
                 calculateSpeed();
                 move();
                 updateGui();
                 setMenu(true);
+                updateFieldOfView();
+                updateVisibility();
                 break;
             case GameMode.PAUSED:
                 setMenu(false);
@@ -64,6 +67,19 @@ public class Player : MonoBehaviour
         {
             guiManager.setPauseMenu(state);
             Time.timeScale = state ? 0 : 1;
+
+        }
+    }
+
+    private void updateFieldOfView()
+    {
+        if (isCloseToItem)
+        {
+            cam.fieldOfView = Mathf.Lerp(cam.fieldOfView, 40, Time.deltaTime * 2f);
+        }
+        else
+        {
+            cam.fieldOfView = Mathf.Lerp(cam.fieldOfView, 60, Time.deltaTime * 2f);
         }
     }
 
@@ -88,7 +104,7 @@ public class Player : MonoBehaviour
         }
         if (Input.GetKey(KeyCode.D))
         {
-            transform.localScale = new Vector3( 0.3f, 0.3f, 1);
+            transform.localScale = new Vector3(0.3f, 0.3f, 1);
             transform.Translate(Time.deltaTime * totalSpeed, 0, 0, Space.World);
         }
         anim.SetFloat("speed", speed);
@@ -116,39 +132,44 @@ public class Player : MonoBehaviour
             totalSpeed = _PLAYER_WALK_SPEED;
         }
 
-        
+
         stamina = Mathf.Clamp(stamina, 0, _PLAYER_RUN_TIME);
     }
 
     private void updateGui()
     {
-        guiManager.updateStaminaBar(stamina/ _PLAYER_RUN_TIME);
+        guiManager.updateStaminaBar(stamina / _PLAYER_RUN_TIME);
     }
 
-
-    private void OnTriggerEnter(Collider other)
-    {
-        if (other.GetComponent<GetItem>())
-        {
-            cam.fieldOfView = 40;
-        }
-    }
 
     private void OnTriggerStay(Collider other)
     {
+
         if (Input.GetKey(KeyCode.Space) && other.GetComponent<GetItem>())
         {
             GetItem getItem = (GetItem)other.GetComponent<GetItem>();
             inventory.items.Add(getItem.item);
             guiManager.addItem(getItem.item);
             Destroy(other.gameObject);
-            cam.fieldOfView = 60;
+            isCloseToItem = false;
+        }
+    }
+
+    private bool isCloseToItem = false;
+    private void OnTriggerEnter(Collider other)
+    {
+        if (other.GetComponent<GetItem>())
+        {
+            isCloseToItem = true;
         }
     }
 
     private void OnTriggerExit(Collider other)
     {
-        cam.fieldOfView = 60;
+        if (other.GetComponent<GetItem>())
+        {
+            isCloseToItem = false;
+        }
     }
 
     public void enterSceneChangeDoor(int nextScene)
@@ -164,12 +185,13 @@ public class Player : MonoBehaviour
     public void onCutscene(bool active)
     {
         gameMode = active ? GameMode.CUT_SCENE : GameMode.MAIN;
-        if(active)
+        if (active)
         {
             cutsceneCam.transform.position = cam.transform.position;
             cam.gameObject.SetActive(false);
             cutsceneCam.gameObject.SetActive(true);
-        } else
+        }
+        else
         {
             cam.gameObject.SetActive(true);
             StartCoroutine("goToCameraPos");
@@ -198,5 +220,66 @@ public class Player : MonoBehaviour
         cutsceneCam.transform.position = targetPosition;
         cutsceneCam.transform.rotation = targetRotation;
         cutsceneCam.gameObject.SetActive(false);
+    }
+
+
+    [SerializeField] private LayerMask wallMask;
+    [SerializeField] private float sphereRadius = 1.5f;
+    private List<Renderer> lastHitRenderers = new List<Renderer>();
+    private void updateVisibility()
+    {
+        foreach (Renderer renderer in lastHitRenderers)
+        {
+            if (renderer != null)
+            {
+                foreach (Material mat in renderer.materials)
+                {
+                    mat.SetFloat("_CutoutSize", 0f);
+                }
+            }
+        }
+        lastHitRenderers.Clear();
+
+        Vector2 cutoutPos = cam.WorldToViewportPoint(transform.position);
+        cutoutPos.y /= (Screen.width / Screen.height);
+
+        Vector3 camToChar = transform.position - cam.transform.position;
+        float playerDistance = camToChar.magnitude;
+
+        RaycastHit[] hitObjects = Physics.SphereCastAll(cam.transform.position, sphereRadius, camToChar.normalized, playerDistance, wallMask);
+
+        for (int i = 0; i < hitObjects.Length; ++i)
+        {
+            Renderer renderer = hitObjects[i].transform.GetComponent<Renderer>();
+            if (renderer != null)
+            {
+
+                if (hitObjects[i].point.z < transform.position.z 
+                    && hitObjects[i].transform.localEulerAngles.y != 90 
+                    && hitObjects[i].transform.localEulerAngles.y != -90)
+                {
+                    Material[] materials = renderer.materials;
+
+                    for (int m = 0; m < materials.Length; ++m)
+                    {
+                        materials[m].SetVector("_CutoutPos", cutoutPos);
+                        materials[m].SetFloat("_CutoutSize", 0.16f);
+                        materials[m].SetFloat("_FalloffSize", 0.08f);
+                    }
+
+                    lastHitRenderers.Add(renderer);
+                } else
+                {
+                    Material[] materials = renderer.materials;
+
+                    for (int m = 0; m < materials.Length; ++m)
+                    {
+                        materials[m].SetFloat("_CutoutSize", 0f);
+                    }
+
+                    lastHitRenderers.Add(renderer);
+                }
+            }
+        }
     }
 }
