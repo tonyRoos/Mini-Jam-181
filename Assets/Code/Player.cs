@@ -1,6 +1,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.EventSystems;
 
 public enum GameMode
 {
@@ -40,12 +41,11 @@ public class Player : MonoBehaviour
         anim.SetFloat("speed", 0);
     }
 
-    private void Update()
+    private void FixedUpdate()
     {
         switch (gameMode)
         {
             case GameMode.MAIN:
-                calculateSpeed();
                 move();
                 updateGui();
                 setMenu(true);
@@ -87,36 +87,12 @@ public class Player : MonoBehaviour
     private void move()
     {
         updatePlayerSpeed();
-        if (Input.GetKey(KeyCode.W))
-        {
-            anim.SetBool("isUp", true);
-            transform.Translate(0, 0, Time.deltaTime * totalSpeed, Space.World);
+        Vector3 movement = new Vector3(Input.GetAxis("Horizontal"), 0, Input.GetAxis("Vertical"));
+        rb.linearVelocity = totalSpeed * movement;
+        anim.SetBool("isUp", movement.z > 0);
+        transform.localScale = new Vector3((movement.x > 0 ? 1 : -1) * 0.3f, 0.3f, 1);
 
-        }
-        if (Input.GetKey(KeyCode.A))
-        {
-            transform.localScale = new Vector3(-0.3f, 0.3f, 1);
-            transform.Translate(Time.deltaTime * -totalSpeed, 0, 0, Space.World);
-        }
-        if (Input.GetKey(KeyCode.S))
-        {
-            anim.SetBool("isUp", false);
-            transform.Translate(0, 0, Time.deltaTime * -totalSpeed, Space.World);
-        }
-        if (Input.GetKey(KeyCode.D))
-        {
-            transform.localScale = new Vector3(0.3f, 0.3f, 1);
-            transform.Translate(Time.deltaTime * totalSpeed, 0, 0, Space.World);
-        }
-        anim.SetFloat("speed", speed);
-    }
-
-    private float speed;
-    private Vector3 lastPosition;
-    private void calculateSpeed()
-    {
-        speed = (transform.position - lastPosition).magnitude / Time.deltaTime;
-        lastPosition = transform.position;
+        anim.SetFloat("speed", rb.linearVelocity.magnitude);
     }
 
     private void updatePlayerSpeed()
