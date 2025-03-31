@@ -1,12 +1,8 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
-using UnityEngine.Audio;
-using UnityEngine.Playables;
 using UnityEngine.SceneManagement;
 using UnityEngine.UI;
-using UnityEngine.Video;
-using static TMPro.SpriteAssetUtilities.TexturePacker_JsonArray;
 
 public class Intro : MonoBehaviour
 {
@@ -28,6 +24,11 @@ public class Intro : MonoBehaviour
             Debug.LogError("Missing components or frames in SpriteVideoPlayer.");
             SceneManager.LoadScene(2);
         }
+    }
+
+    private void Update()
+    {
+        if(Input.GetKeyDown(KeyCode.Space)) { SceneManager.LoadScene(2); }
     }
 
     public void populateFrames(Sprite[] frames)

@@ -55,6 +55,7 @@ public class Player : MonoBehaviour
                 updateFieldOfView();
                 updateVisibility();
                 if(Input.GetKeyDown(KeyCode.F1) || transform.position.y < -4) { Die(); }
+                if(isTriggered) { handleCollisorInteraction(); }
                 break;
             case GameMode.PAUSED:
                 break;
@@ -83,7 +84,7 @@ public class Player : MonoBehaviour
 
     private void updateFieldOfView()
     {
-        if (isCloseToItem)
+        if (isTriggered)
         {
             cam.fieldOfView = Mathf.Lerp(cam.fieldOfView, 40, Time.deltaTime * 2f);
         }
@@ -134,32 +135,31 @@ public class Player : MonoBehaviour
         guiManager.updateStaminaBar(stamina / _PLAYER_RUN_TIME);
     }
 
-
-    private void OnTriggerStay(Collider other)
-    {
-
-        if (Input.GetKey(KeyCode.Space) && other.GetComponent<GetItem>())
+    private void handleCollisorInteraction() {
+        if (Input.GetKey(KeyCode.Space) && triggerInfo.GetComponent<GetItem>())
         {
-            GetItem getItem = (GetItem)other.GetComponent<GetItem>();
+            GetItem getItem = (GetItem)triggerInfo.GetComponent<GetItem>();
             inventory.items.Add(getItem.item);
             guiManager.addItem(getItem.item);
             audioSrc.PlayOneShot(getItem.getSound);
-            Destroy(other.gameObject);
-            isCloseToItem = false;
+            Destroy(triggerInfo.gameObject);
+            isTriggered = false;
         }
 
-        if (Input.GetKeyDown(KeyCode.Space) && other.GetComponent<Puzzle_Hat>())
+        if (Input.GetKeyDown(KeyCode.Space) && triggerInfo.GetComponent<Puzzle_Hat>())
         {
-            other.GetComponent<Puzzle_Hat>().transport(transform);
+            triggerInfo.GetComponent<Puzzle_Hat>().transport(transform);
         }
     }
 
-    private bool isCloseToItem = false;
+    private bool isTriggered = false;
+    private Collider triggerInfo;
     private void OnTriggerEnter(Collider other)
     {
         if (other.GetComponent<GetItem>() || other.GetComponent<Puzzle_Hat>())
         {
-            isCloseToItem = true;
+            isTriggered = true;
+            triggerInfo = other;
         }
     }
 
@@ -167,7 +167,7 @@ public class Player : MonoBehaviour
     {
         if (other.GetComponent<GetItem>() || other.GetComponent<Puzzle_Hat>())
         {
-            isCloseToItem = false;
+            isTriggered = false;
         }
     }
 

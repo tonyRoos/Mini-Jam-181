@@ -1,6 +1,7 @@
 using System.Collections;
 using TMPro;
 using UnityEngine;
+using UnityEngine.Playables;
 using UnityEngine.UI;
 
 
@@ -23,13 +24,22 @@ public class Dialog : MonoBehaviour
     [SerializeField] private AudioClip chatSound;
 
     private AudioSource audioSrc;
-
+    private PlayableDirector PlayableDirector;
 
 
     private void Awake()
     {
         dialogArea.SetActive(false);
         audioSrc = gameObject.GetComponent<AudioSource>();
+        PlayableDirector = GameObject.FindFirstObjectByType<PlayableDirector>();
+    }
+
+    private void Update()
+    {
+        if (Input.GetKeyDown(KeyCode.Space) && PlayableDirector != null) {
+            PlayableDirector.time = PlayableDirector.duration;
+            PlayableDirector.Evaluate();
+        }
     }
 
     private Coroutine typingCoroutine = null;
