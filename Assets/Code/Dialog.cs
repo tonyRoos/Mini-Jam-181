@@ -20,11 +20,16 @@ public class Dialog : MonoBehaviour
     [SerializeField] private Image characterAvatar;
     [SerializeField] private TMP_Text characterNameUI;
     [SerializeField] private TMP_Text speechUi;
+    [SerializeField] private AudioClip chatSound;
+
+    private AudioSource audioSrc;
+
 
 
     private void Awake()
     {
         dialogArea.SetActive(false);
+        audioSrc = gameObject.GetComponent<AudioSource>();
     }
 
     private Coroutine typingCoroutine = null;
@@ -54,6 +59,9 @@ public class Dialog : MonoBehaviour
         foreach (char letter in text)
         {
             speechUi.text += letter;
+            audioSrc.Stop();
+            audioSrc.pitch = Random.Range(0.6f, 1.4f);
+            audioSrc.PlayOneShot(chatSound);
             yield return new WaitForSeconds(delay);
         }
         typingCoroutine = null;

@@ -4,6 +4,7 @@ public class GetItem : MonoBehaviour
 {
     public Item item;
     [SerializeField] Transform itemSprite;
+    public AudioClip getSound;
 
     private void Update()
     {

@@ -170,6 +170,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   item: {fileID: 11400000, guid: 0d0b58bbf292da34aa5474252b6d2f1b, type: 2}
   itemSprite: {fileID: 3461752497622049409}
+  getSound: {fileID: 8300000, guid: 266500dd2c8b2c44d9b7e832eefa254c, type: 3}
 --- !u!135 &9165515095563370285
 SphereCollider:
   m_ObjectHideFlags: 0

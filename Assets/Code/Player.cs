@@ -25,6 +25,8 @@ public class Player : MonoBehaviour
 
     private Animator anim;
     private Rigidbody rb;
+    private AudioSource audioSrc;
+    [SerializeField] AudioClip stepSound;
 
 
     private void Awake()
@@ -38,28 +40,35 @@ public class Player : MonoBehaviour
         }
         anim = GetComponent<Animator>();
         rb = GetComponent<Rigidbody>();
+        audioSrc = GetComponent<AudioSource>();
         anim.SetFloat("speed", 0);
     }
 
-    private void FixedUpdate()
+    private void Update()
     {
         switch (gameMode)
         {
             case GameMode.MAIN:
                 move();
                 updateGui();
-                setMenu(true);
+                //setMenu(true);
                 updateFieldOfView();
                 updateVisibility();
                 if(Input.GetKeyDown(KeyCode.F1) || transform.position.y < -4) { Die(); }
                 break;
             case GameMode.PAUSED:
-                setMenu(false);
                 break;
             case GameMode.CUT_SCENE:
-                setMenu(true);
+                //setMenu(true);
                 break;
         }
+    }
+
+    public void playStepSoun()
+    {
+        audioSrc.Stop();
+        audioSrc.pitch = Random.Range(0.75f, 1.25f);
+        audioSrc.PlayOneShot(stepSound);
     }
 
     private void setMenu(bool state)
@@ -87,10 +96,17 @@ public class Player : MonoBehaviour
     private void move()
     {
         updatePlayerSpeed();
-        Vector3 movement = new Vector3(Input.GetAxis("Horizontal"), 0, Input.GetAxis("Vertical"));
+        Vector3 movement = new Vector3(Input.GetAxis("Horizontal"), rb.linearVelocity.y/totalSpeed, Input.GetAxis("Vertical"));
         rb.linearVelocity = totalSpeed * movement;
-        anim.SetBool("isUp", movement.z > 0);
-        transform.localScale = new Vector3((movement.x > 0 ? 1 : -1) * 0.3f, 0.3f, 1);
+        
+        if (movement.x != 0)
+        {
+            transform.localScale = new Vector3((movement.x > 0 ? 1 : -1) * 0.3f, 0.3f, 1);
+        }
+        if(movement.z != 0)
+        {
+            anim.SetBool("isUp", movement.z > 0);
+        }
 
         anim.SetFloat("speed", rb.linearVelocity.magnitude);
     }
@@ -127,15 +143,21 @@ public class Player : MonoBehaviour
             GetItem getItem = (GetItem)other.GetComponent<GetItem>();
             inventory.items.Add(getItem.item);
             guiManager.addItem(getItem.item);
+            audioSrc.PlayOneShot(getItem.getSound);
             Destroy(other.gameObject);
             isCloseToItem = false;
+        }
+
+        if (Input.GetKeyDown(KeyCode.Space) && other.GetComponent<Puzzle_Hat>())
+        {
+            other.GetComponent<Puzzle_Hat>().transport(transform);
         }
     }
 
     private bool isCloseToItem = false;
     private void OnTriggerEnter(Collider other)
     {
-        if (other.GetComponent<GetItem>())
+        if (other.GetComponent<GetItem>() || other.GetComponent<Puzzle_Hat>())
         {
             isCloseToItem = true;
         }
@@ -143,7 +165,7 @@ public class Player : MonoBehaviour
 
     private void OnTriggerExit(Collider other)
     {
-        if (other.GetComponent<GetItem>())
+        if (other.GetComponent<GetItem>() || other.GetComponent<Puzzle_Hat>())
         {
             isCloseToItem = false;
         }
@@ -259,11 +281,11 @@ public class Player : MonoBehaviour
             }
         }
     }
-
     
     private void Die()
     {
         guiManager.setDeathScreen(true);
         gameMode = GameMode.CUT_SCENE;
+        gameObject.SetActive(false);
     }
 }

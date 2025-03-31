@@ -6,9 +6,11 @@ public class Puzzle_Button : MonoBehaviour
     public enum Tags { NONE, RedDoor, GreenDoor, BlueDoor, YellowDoor  }
 
     [SerializeField] Tags Opens, Closes;
+    [SerializeField] AudioClip buttonPressSound;
     private Transform[] OpensList;
     private Transform[] ClosesList;
     private Animator anim;
+    private AudioSource audioSrc;
 
     private void Awake()
     {
@@ -17,12 +19,14 @@ public class Puzzle_Button : MonoBehaviour
         tagText = Closes.ToString();
         ClosesList = Closes != Tags.NONE ? GameObject.FindGameObjectsWithTag(tagText).Select(obj => obj.transform).ToArray() : null;
         anim = GetComponent<Animator>();
+        audioSrc = GetComponent<AudioSource>();
     }
 
     private void OnTriggerEnter(Collider other)
     {
         if(other.tag == "Player")
         {
+            audioSrc.PlayOneShot(buttonPressSound);
             anim.SetBool("isPressed", true);
             if (OpensList != null) {
                 foreach (Transform t in OpensList)

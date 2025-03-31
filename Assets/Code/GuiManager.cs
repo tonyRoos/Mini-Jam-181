@@ -8,7 +8,7 @@ using System.Collections;
 
 public class GuiManager : MonoBehaviour
 {
-    [SerializeField] private GameObject pauseMenuArea, playModeUiArea, deathScreen;
+    [SerializeField] private GameObject pauseMenuArea, playModeUiArea, deathScreen, endGameScreen;
 
     [SerializeField] private Gradient staminaGradient;
     [SerializeField] private Image staminaBar;
@@ -25,6 +25,7 @@ public class GuiManager : MonoBehaviour
         playModeUiArea.SetActive(true);
         cutsceneMode.SetActive(false);
         deathScreen.SetActive(false);
+        endGameScreen.SetActive(false);
     }
 
     public void updateStaminaBar(float status)
@@ -84,9 +85,18 @@ public class GuiManager : MonoBehaviour
         cutsceneMode.SetActive(active);
     }
 
+    [SerializeField] AudioClip deathSceneMusic;
     public void setDeathScreen(bool active)
     {
         deathScreen.SetActive(active);
+        Camera.main.GetComponent<AudioSource>().clip = deathSceneMusic;
+    }
+
+    [SerializeField] AudioClip endSceneMusic;
+    public void setEndGameScreen(bool active)
+    {
+        endGameScreen.SetActive(active);
+        Camera.main.GetComponent<AudioSource>().clip = endSceneMusic;
     }
 
 }
