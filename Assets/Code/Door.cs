@@ -31,7 +31,7 @@ public class Door : MonoBehaviour
                 {
                     key = null;
                     tryOpenDoor(true);
-                    if (isFinalScene) { player.guiManager.setEndGameScreen(true); return; }
+                    if (isFinalScene) { player.guiManager.fadeOut(0, GuiManager.FadeType.END_JAM_EDITION); return; }
                     navigateToNextScene();
                 } else
                 {

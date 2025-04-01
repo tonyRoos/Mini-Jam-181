@@ -1,2 +1,26 @@
 fileFormatVersion: 2
 guid: 3fddc5b8cbdf9224e9ed69f13283dcf9
+MonoImporter:
+  externalObjects: {}
+  serializedVersion: 2
+  defaultReferences:
+  - pauseMenuArea: {instanceID: 0}
+  - playModeUiArea: {instanceID: 0}
+  - deathScreen: {instanceID: 0}
+  - endGameScreen: {instanceID: 0}
+  - staminaBar: {instanceID: 0}
+  - HorizontalList: {instanceID: 0}
+  - ItemUiPrefab: {instanceID: 0}
+  - fade: {instanceID: 0}
+  - fadeMask: {instanceID: 0}
+  - cutsceneMode: {instanceID: 0}
+  - keyMask: {fileID: 21300000, guid: b6e42ff2a7c81584aa0113f49c30e8fa, type: 3}
+  - deathMask: {instanceID: 0}
+  - endMask: {instanceID: 0}
+  - deathSceneMusic: {instanceID: 0}
+  - endSceneMusic: {instanceID: 0}
+  executionOrder: 0
+  icon: {instanceID: 0}
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 

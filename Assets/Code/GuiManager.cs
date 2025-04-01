@@ -98,10 +98,10 @@ public class GuiManager : MonoBehaviour
                 GameManager.currentLevel = nextScene;
                 break;
             case FadeType.DEATH:
-                
+                setDeathScreen(true);
                 break;
             case FadeType.END_JAM_EDITION:
-                
+                setEndGameScreen(true);
                 break;
         }
 
@@ -125,6 +125,7 @@ public class GuiManager : MonoBehaviour
     {
         deathScreen.SetActive(active);
         Camera.main.GetComponent<AudioSource>().clip = deathSceneMusic;
+        Camera.main.GetComponent<AudioSource>().Play();
     }
 
     [SerializeField] AudioClip endSceneMusic;
@@ -132,6 +133,7 @@ public class GuiManager : MonoBehaviour
     {
         endGameScreen.SetActive(active);
         Camera.main.GetComponent<AudioSource>().clip = endSceneMusic;
+        Camera.main.GetComponent<AudioSource>().Play();
     }
 
 }

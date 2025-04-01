@@ -61,6 +61,7 @@ public class Player : MonoBehaviour
                 break;
             case GameMode.CUT_SCENE:
                 //setMenu(true);
+                rb.linearVelocity = Vector3.zero;
                 break;
         }
     }
@@ -173,7 +174,7 @@ public class Player : MonoBehaviour
 
     public void enterSceneChangeDoor(int nextScene)
     {
-        guiManager.fadeOut(nextScene);
+        guiManager.fadeOut(nextScene, GuiManager.FadeType.KEY);
     }
 
     public Inventory getInventory()
@@ -284,7 +285,7 @@ public class Player : MonoBehaviour
     
     private void Die()
     {
-        guiManager.setDeathScreen(true);
+        guiManager.fadeOut(0, GuiManager.FadeType.DEATH);
         gameMode = GameMode.CUT_SCENE;
         gameObject.SetActive(false);
     }
