@@ -5,6 +5,7 @@ using UnityEngine.SceneManagement;
 using UnityEngine.UI;
 using System.Threading.Tasks;
 using System.Collections;
+using static GuiManager;
 
 public class GuiManager : MonoBehaviour
 {
@@ -44,17 +45,36 @@ public class GuiManager : MonoBehaviour
         }
     }
 
-    public void fadeOut(int nextScene)
+    public enum FadeType
     {
+        KEY, DEATH, END_JAM_EDITION 
+    }
+
+    [SerializeField] Sprite keyMask, deathMask, endMask;
+    public void fadeOut(int nextScene, FadeType fadeType)
+    {
+        switch(fadeType)
+        {
+            case FadeType.KEY:
+                fadeMask.sprite = keyMask;
+                break;
+            case FadeType.DEATH:
+                fadeMask.sprite = deathMask;
+                break;
+            case FadeType.END_JAM_EDITION:
+                fadeMask.sprite = endMask;
+                break;
+        }
+
         fade.gameObject.SetActive(true);
         fade.rectTransform.localScale = Vector3.one;
         fadeMask.gameObject.SetActive(true);
         fadeMask.rectTransform.localScale = Vector3.one;
 
-        StartCoroutine(ScaleImage(Vector3.one, Vector3.zero, 2f, nextScene));
+        StartCoroutine(ScaleImage(Vector3.one, Vector3.zero, 2f, nextScene, fadeType));
     }
 
-    IEnumerator ScaleImage(Vector3 from, Vector3 to, float duration, int nextScene)
+    IEnumerator ScaleImage(Vector3 from, Vector3 to, float duration, int nextScene, FadeType fadeType)
     {
         float elapsedTime = 0f;
         RectTransform rectTransform = fadeMask.rectTransform;
@@ -68,10 +88,25 @@ public class GuiManager : MonoBehaviour
         }
 
         rectTransform.localScale = to;
-        if (nextScene == 0) yield break;
+
+        switch (fadeType)
+        {
+            case FadeType.KEY:
+                if (nextScene == 0) yield break;
+
+                SceneManager.LoadScene(nextScene);
+                GameManager.currentLevel = nextScene;
+                break;
+            case FadeType.DEATH:
+                
+                break;
+            case FadeType.END_JAM_EDITION:
+                
+                break;
+        }
+
+
         
-        SceneManager.LoadScene(nextScene);
-        GameManager.currentLevel = nextScene;
     }
 
     public void setPauseMenu(bool active)

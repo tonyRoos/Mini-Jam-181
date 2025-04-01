@@ -62,7 +62,7 @@ public class Door : MonoBehaviour
     {
         if (nextScene > -1)
         {
-            player.guiManager.fadeOut(nextScene);
+            player.guiManager.fadeOut(nextScene, GuiManager.FadeType.KEY);
             player.gameMode = GameMode.CUT_SCENE;
         }
     }

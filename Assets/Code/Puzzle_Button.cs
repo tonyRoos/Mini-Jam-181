@@ -32,6 +32,7 @@ public class Puzzle_Button : MonoBehaviour
                 foreach (Transform t in OpensList)
                 {
                     t.localEulerAngles = new Vector3(0, -80, 0);
+                    t.GetComponentInChildren<BoxCollider>().enabled = false;
                 }
             }
             if (ClosesList != null)
@@ -39,6 +40,7 @@ public class Puzzle_Button : MonoBehaviour
                 foreach (Transform t in ClosesList)
                 {
                     t.localEulerAngles = Vector3.zero;
+                    t.GetComponentInChildren<BoxCollider>().enabled = true;
                 }
             }
         }
