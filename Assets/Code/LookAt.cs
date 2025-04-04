@@ -1,5 +1,7 @@
 using UnityEngine;
 
+/* código do movimento de camera */
+
 public class LookAt : MonoBehaviour
 {
     [SerializeField] private bool follow = true;

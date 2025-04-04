@@ -1,5 +1,7 @@
 using UnityEngine;
 
+/* Script que faz a transição do personagem entre dois chapéus */
+
 public class Puzzle_Hat : MonoBehaviour
 {
     [SerializeField] private Puzzle_Hat connection;

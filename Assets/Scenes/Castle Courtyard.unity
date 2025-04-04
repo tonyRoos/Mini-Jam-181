@@ -5616,7 +5616,12 @@ MonoBehaviour:
   characterAvatar: {fileID: 1723055388}
   characterNameUI: {fileID: 180108375}
   speechUi: {fileID: 1876491393}
-  chatSound: {fileID: 8300000, guid: f47d0928cf6db544a8cf344a2a916ce1, type: 3}
+  chatSounds:
+  - {fileID: 8300000, guid: e9cbf3940b936a84e95e4a66175fdda8, type: 3}
+  - {fileID: 8300000, guid: 8810914d0a9728144b74a9abcf8ae8e0, type: 3}
+  - {fileID: 8300000, guid: 3ea28b8046846604daf4817b123563da, type: 3}
+  - {fileID: 8300000, guid: 2b3aab87e1afdf1449d87c0a1c359603, type: 3}
+  - {fileID: 8300000, guid: cb415ca88e9a84c438c5e0a2bd0f652d, type: 3}
 --- !u!82 &2051667264
 AudioSource:
   m_ObjectHideFlags: 0

@@ -1,6 +1,8 @@
 using UnityEngine;
 using System.Linq;
 
+/* Permite abrir e fechar portas através das tags dos objetos, assim, as portas não precisam ser adicionadas a uma lista, reduzindo o trabalho de level design. */
+
 public class Puzzle_Button : MonoBehaviour
 {
     public enum Tags { NONE, RedDoor, GreenDoor, BlueDoor, YellowDoor  }

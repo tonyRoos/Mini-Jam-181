@@ -4,14 +4,16 @@ using UnityEngine;
 using System.IO;
 using System.Linq;
 
-[CustomEditor(typeof(Intro))]
-public class SpriteVideoPlayerEditor : Editor
+/* Esse código preenche os frames na classe "FrameByFrameVideo", ele só roda no editor, graças a notação #if UNITY_EDITOR e #endif */
+
+[CustomEditor(typeof(FrameByFrameVideo))]
+public class FrameFiller : Editor
 {
     public override void OnInspectorGUI()
     {
         DrawDefaultInspector();
 
-        Intro player = (Intro)target;
+        FrameByFrameVideo player = (FrameByFrameVideo)target;
 
         if (GUILayout.Button("Load Sprites from Folder"))
         {
@@ -23,7 +25,7 @@ public class SpriteVideoPlayerEditor : Editor
         }
     }
 
-    private void LoadSpritesFromFolder(Intro player, string folderPath)
+    private void LoadSpritesFromFolder(FrameByFrameVideo player, string folderPath)
     {
         string relativePath = "Assets" + folderPath.Substring(Application.dataPath.Length);
         string[] files = Directory.GetFiles(relativePath, "*.png");

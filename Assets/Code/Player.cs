@@ -1,13 +1,16 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
-using UnityEngine.EventSystems;
+
+/* Comportamento do player, incluindo alguns detalhes como zoom de camera */
 
 public enum GameMode
 {
     MAIN, PAUSED, CUT_SCENE
 }
 
+//Require component evita que o desenvolvedor remova esses componentes importantes do objeto, também adiciona eles caso não existam no objeto que receber esse script
+[RequireComponent(typeof(Rigidbody), typeof(Animator), typeof(AudioSource))]
 public class Player : MonoBehaviour
 {
     public GuiManager guiManager;
@@ -15,8 +18,7 @@ public class Player : MonoBehaviour
     private const float _PLAYER_WALK_SPEED = 2.5f;
     private const float _PLAYER_RUN_SPEED = 4f;
     private const float _PLAYER_RUN_TIME = 5F;
-    private float stamina = 5;
-    private float totalSpeed;
+    private float stamina = _PLAYER_RUN_TIME;
 
     private Camera cam, cutsceneCam;
     public GameMode gameMode = GameMode.CUT_SCENE;
@@ -44,6 +46,7 @@ public class Player : MonoBehaviour
         anim.SetFloat("speed", 0);
     }
 
+    // o botão f1 causa a morte do personagem, para fins de testes de telas e caso o personagem fique preso em algum canto ou o puzzle fique travado
     private void Update()
     {
         switch (gameMode)
@@ -66,13 +69,15 @@ public class Player : MonoBehaviour
         }
     }
 
-    public void playStepSoun()
+    // Usado pela animação de caminhar do personagem
+    public void playStepSound()
     {
         audioSrc.Stop();
         audioSrc.pitch = Random.Range(0.75f, 1.25f);
         audioSrc.PlayOneShot(stepSound);
     }
 
+    // Não está em uso até que seja implementado o menu de pause
     private void setMenu(bool state)
     {
         if (Input.GetKeyDown(KeyCode.Tab))
@@ -83,6 +88,7 @@ public class Player : MonoBehaviour
         }
     }
 
+    // Zoom in caso o personagem esteja em um trigger
     private void updateFieldOfView()
     {
         if (isTriggered)
@@ -95,12 +101,13 @@ public class Player : MonoBehaviour
         }
     }
 
+    // Movimenta o personagem a partir dos inputs, configura escala do sprite para o personagem virar para esquerda ou direita, e alimenta o animator do personagem
     private void move()
     {
-        updatePlayerSpeed();
-        Vector3 movement = new Vector3(Input.GetAxis("Horizontal"), rb.linearVelocity.y/totalSpeed, Input.GetAxis("Vertical"));
-        rb.linearVelocity = totalSpeed * movement;
-        
+        Vector3 movement = new Vector3(Input.GetAxis("Horizontal"), rb.linearVelocity.y, Input.GetAxis("Vertical"));
+        rb.linearVelocity = new Vector3(updatePlayerSpeed() * movement.x, rb.linearVelocity.y, updatePlayerSpeed() * movement.z);
+
+
         if (movement.x != 0)
         {
             transform.localScale = new Vector3((movement.x > 0 ? 1 : -1) * 0.3f, 0.3f, 1);
@@ -113,29 +120,33 @@ public class Player : MonoBehaviour
         anim.SetFloat("speed", rb.linearVelocity.magnitude);
     }
 
-    private void updatePlayerSpeed()
+
+    // redefine a velocidade atual e consome ou regenera stamina
+    private float updatePlayerSpeed()
     {
         if (Input.GetKey(KeyCode.LeftShift) && stamina > 0 &&
-            (Input.GetKey(KeyCode.W) || Input.GetKey(KeyCode.A) || Input.GetKey(KeyCode.S) || Input.GetKey(KeyCode.D)))
+            (Input.GetAxis("Horizontal") != 0 || Input.GetAxis("Vertical") != 0))
         {
             stamina -= Time.deltaTime;
-            totalSpeed = _PLAYER_RUN_SPEED;
+            stamina = Mathf.Clamp(stamina, 0, _PLAYER_RUN_TIME);
+            return _PLAYER_RUN_SPEED;
         }
         else
         {
             stamina += Time.deltaTime / 2;
-            totalSpeed = _PLAYER_WALK_SPEED;
+            stamina = Mathf.Clamp(stamina, 0, _PLAYER_RUN_TIME);
+            return _PLAYER_WALK_SPEED;
         }
-
-
-        stamina = Mathf.Clamp(stamina, 0, _PLAYER_RUN_TIME);
     }
 
+    // Atualiza a barra de stamina na UI - atualmente desativada
     private void updateGui()
     {
         guiManager.updateStaminaBar(stamina / _PLAYER_RUN_TIME);
     }
 
+
+    // Transfere as interações da colisão para dentro do update para garantir uma consistencia melhor no input por exemplo
     private void handleCollisorInteraction() {
         if (Input.GetKey(KeyCode.Space) && triggerInfo.GetComponent<GetItem>())
         {
@@ -172,16 +183,19 @@ public class Player : MonoBehaviour
         }
     }
 
+    // Essa função de fade out dispara o evento, por exemplo, nesse caso vai ter o fade com a máscara de chave, e posteriormente trocar de cena é chamado pelo fim da coroutine que fica responsável pelo fade
     public void enterSceneChangeDoor(int nextScene)
     {
         guiManager.fadeOut(nextScene, GuiManager.FadeType.KEY);
     }
 
+    // Permite outras classes acessarem o invetário do personagem. (ex.: a porta confere se a chave está presente)
     public Inventory getInventory()
     {
         return inventory;
     }
 
+    // Quando entra em cutscene, posiciona a camera da cutscene na posição da camera main, e vice-versa.
     public void onCutscene(bool active)
     {
         gameMode = active ? GameMode.CUT_SCENE : GameMode.MAIN;
@@ -198,6 +212,7 @@ public class Player : MonoBehaviour
         }
     }
 
+    // Essa é uma coroutine que serve para camera de cutscene se deslocar em direção a camera main, na tentativa de suavizar a transição
     private IEnumerator goToCameraPos()
     {
         Vector3 initialPosition = cutsceneCam.transform.position;
@@ -222,7 +237,8 @@ public class Player : MonoBehaviour
         cutsceneCam.gameObject.SetActive(false);
     }
 
-
+    // Configura a visibilidade através das paredes, as paredes que ficarão "invisiveis" devem receber o shader graph ShaderGraph/WallCutout
+    // Casta uma RaySphere, é como um rayCast normal, mas considera um diametro em torno do raio, isso evita a necessidade de múltiplos raios e funciona melhor em algumas ocasiões.
     [SerializeField] private LayerMask wallMask;
     [SerializeField] private float sphereRadius = 1.5f;
     private List<Renderer> lastHitRenderers = new List<Renderer>();

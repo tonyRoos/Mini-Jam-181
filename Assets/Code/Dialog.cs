@@ -4,24 +4,26 @@ using UnityEngine;
 using UnityEngine.Playables;
 using UnityEngine.UI;
 
+/* Responsável por mostrar os personagens, virados conforme o lado na tela e escreve o texto da fala enquanto roda um áudio. */
 
 public class Dialog : MonoBehaviour
 {
     [System.Serializable]
     public class DialogData
     {
-        public Character character;
+        public DialogAvatar character;
         public string speech;
         public bool leftToRight;
     }
 
+    [SerializeField] private Vector2 speechPitch = new Vector2( 1.2f , 1.8f);
     [SerializeField] private DialogData[] dialogs;
     [SerializeField] private GameObject dialogArea;
     [SerializeField] private RectTransform turnableArea;
     [SerializeField] private Image characterAvatar;
     [SerializeField] private TMP_Text characterNameUI;
     [SerializeField] private TMP_Text speechUi;
-    [SerializeField] private AudioClip chatSound;
+    [SerializeField] private AudioClip[] chatSounds;
 
     private AudioSource audioSrc;
     private PlayableDirector PlayableDirector;
@@ -63,15 +65,21 @@ public class Dialog : MonoBehaviour
         dialogArea.SetActive(false);
     }
 
+    private bool playedSoundLastLetter = false;
     public IEnumerator TypeText(string text, float delay)
     {
         speechUi.text = "";
         foreach (char letter in text)
         {
             speechUi.text += letter;
-            audioSrc.Stop();
-            audioSrc.pitch = Random.Range(0.6f, 1.4f);
-            audioSrc.PlayOneShot(chatSound);
+            if (!playedSoundLastLetter)
+            {
+                audioSrc.Stop();
+                audioSrc.pitch = Random.Range(1.2f, 1.8f);
+                audioSrc.PlayOneShot(chatSounds[Random.Range(0, chatSounds.Length - 1)]);
+            }
+
+            playedSoundLastLetter = !playedSoundLastLetter;
             yield return new WaitForSeconds(delay);
         }
         typingCoroutine = null;

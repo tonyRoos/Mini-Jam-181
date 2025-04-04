@@ -3,9 +3,9 @@ using System.Linq;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 using UnityEngine.UI;
-using System.Threading.Tasks;
 using System.Collections;
-using static GuiManager;
+
+// Eu utilizei GUI = Graphic User Interface, pra me referir somente a parte gráfica de interface de usuário, deixando outras classes com os valores "de baixo do capô"
 
 public class GuiManager : MonoBehaviour
 {
@@ -104,9 +104,6 @@ public class GuiManager : MonoBehaviour
                 setEndGameScreen(true);
                 break;
         }
-
-
-        
     }
 
     public void setPauseMenu(bool active)

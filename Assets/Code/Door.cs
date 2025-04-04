@@ -2,6 +2,8 @@ using System.Linq;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 
+/* Esse Código de porta se refere única e exclusivamente as portas de passagem de fase */
+
 public class Door : MonoBehaviour
 {
     [SerializeField] private bool isFinalScene = false;

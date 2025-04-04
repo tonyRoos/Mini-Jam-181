@@ -4,7 +4,8 @@ using UnityEngine;
 using UnityEngine.SceneManagement;
 using UnityEngine.UI;
 
-public class Intro : MonoBehaviour
+/* Essa classe alterna sprites em uma image na UI, pra poder mostrar um video na tela, depois carrega a próxima cena, se tiver. */
+public class FrameByFrameVideo : MonoBehaviour
 {
     [SerializeField] private float frameRate;
     [SerializeField] private Image targetImage;
@@ -21,8 +22,9 @@ public class Intro : MonoBehaviour
         }
         else
         {
+            /* garante que a próxima cena seja carregada caso não existam frames, destino para os frames, audio ou o componente de rodar o audio. */
             Debug.LogError("Missing components or frames in SpriteVideoPlayer.");
-            SceneManager.LoadScene(2);
+            loadNextScene();
         }
     }
 
@@ -47,6 +49,15 @@ public class Intro : MonoBehaviour
             targetImage.sprite = frames[i];
             yield return new WaitForSeconds(frameTime);
         }
-        SceneManager.LoadScene(2);
+
+        loadNextScene();
+    }
+
+    private void loadNextScene()
+    {
+        if (SceneManager.sceneCount > SceneManager.GetActiveScene().buildIndex + 1)
+        {
+            SceneManager.LoadScene(SceneManager.GetActiveScene().buildIndex + 1);
+        }
     }
 }

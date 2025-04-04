@@ -1,5 +1,7 @@
 using UnityEngine;
 
+/* Permite o jogador obter o item criado */
+
 public class GetItem : MonoBehaviour
 {
     public Item item;
